@@ -1,0 +1,59 @@
+name: Deploy to Environments
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Select target environment'
+        required: true
+        type: choice
+        options:
+          - dev-saas
+          - stage-saas
+          - prod-saas
+      app_version:
+        description: 'Application version to deploy'
+        required: true
+        type: string
+      app_name:
+        description: 'Application name'
+        required: false
+        type: string
+        default: zippy-dryrun
+
+jobs:
+
+  trigger-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger workflow
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.WORKFLOW_TRIGGER_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'your-company-io',
+              repo: 'your-company-io-gitops',
+              workflow_id: 'update-environment.yaml',
+              ref: 'main',
+              inputs: {
+                environment: '${{ github.event.inputs.environment }}',
+                app_version: '${{ github.event.inputs.app_version }}',
+                app_name: '${{ github.event.inputs.app_name }}',
+                triggered_by: '${{ github.actor }}',
+                source_run_id: '${{ github.run_id }}'
+              }
+            });
+            console.log('✅ Triggered update workflow');
+
+  # Stage 3: Notify
+  notify:
+    runs-on: ubuntu-latest
+    needs: trigger-update
+    steps:
+      - name: Send notification
+        run: |
+          echo "📢 Deployment triggered successfully!"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Version: ${{ github.event.inputs.app_version }}"
+          # Add Slack/Teams/Email notification here if needed
