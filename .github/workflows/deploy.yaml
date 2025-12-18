@@ -18,7 +18,7 @@ on:
         description: 'Application name'
         required: false
         type: string
-        default: zippy-dryrun
+        default: zippy2
 
 jobs:
 

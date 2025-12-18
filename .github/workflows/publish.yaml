@@ -11,7 +11,7 @@ permissions:
 
 env:
   AWS_REGION: us-west-2
-  ASSUME_ROLE_ARN: arn:aws:iam::555935582951:role/zippy-dryrun-github-application-role
+  ASSUME_ROLE_ARN: arn:aws:iam::555935582951:role/zippy2-github-application-role
 
 jobs:
   publish:
@@ -73,6 +73,8 @@ jobs:
           
           sed -i "s/^version: .*$/version: ${NEW_VERSION}/" Chart.yaml
           sed -i "s/^appVersion: .*$/appVersion: \"${SHORT_SHA}\"/" Chart.yaml
+
+          echo "astro supercup champ!"
           
           echo "📝 Updated Chart.yaml:"
           grep -E '^(version|appVersion):' Chart.yaml
